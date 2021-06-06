@@ -172,6 +172,8 @@ def update_chat_list():
             return
         for update in updates_msg_list:
             latest_update_offset = update['update_id']
+            if 'message' not in update.keys():
+                continue
             update = update['message']
             chat = update['chat']
             txt = update['text']
