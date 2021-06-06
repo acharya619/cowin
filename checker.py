@@ -240,6 +240,7 @@ def update_chat_list():
 
 def parse_json_response(response, chat):
     centers = response['centers']
+    print(centers)
     for center in centers:
         name = center["name"]
         pincode = str(center["pincode"])
@@ -254,13 +255,17 @@ def parse_json_response(response, chat):
             if (chat['onlyAvailable'].upper() == 'Y' or chat['onlyAvailable'].upper() == 'YES') and capacity > '0':
                 if (chat['only45Plus'].upper() == 'Y' or chat['only45Plus'].upper() == 'YES') and age_limit < '45':
                     msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
+                    send_msg(msg, chat['id'])
                 elif chat['only45Plus'].upper() == 'N' or chat['only45Plus'].upper() == 'NO':
                     msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
+                    send_msg(msg, chat['id'])
             elif chat['onlyAvailable'].upper() == 'N' or chat['onlyAvailable'].upper() == 'NO':
                 if (chat['only45Plus'].upper() == 'Y' or chat['only45Plus'].upper() == 'YES') and age_limit < '45':
                     msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
+                    send_msg(msg, chat['id'])
                 elif chat['only45Plus'].upper() == 'N' or chat['only45Plus'].upper() == 'NO':
                     msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
+                    send_msg(msg, chat['id'])
                       
                 
             
@@ -269,7 +274,7 @@ if __name__ == "__main__":
     try:
         logger.info("...Service started...")
         states_list = fetchStatesList()
-        limit = 2
+        limit = 15
         while True:
             strt_time = time.time()
             logger.debug(str(chat_id_list) if chat_id_list != [] else "No Chat IDs found")
