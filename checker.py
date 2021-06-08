@@ -1,9 +1,9 @@
 import requests
 import json
 from datetime import date
-import logging, time
+import logging, time, os
 
-bot_token = '1882701276:AAGxT6p7YTFqhWZTxkbQmBKWAnp-kvdhLOk'
+bot_token = os.environ.get('BOT_TOKEN', None)
 
 chat_id_list = []
 offset = 0
@@ -84,7 +84,7 @@ def send_msg(bot_message, chat_id):
     return json.loads(response.content)
 
 def build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap):
-    msg = "*_" + name + "_*\nPincode: " + pincode + "\nFee: " + fee + "\nDate: " + slot_date + "\nCapacity: " + capacity + "\nAge limit: " + age_limit + "\nVaccine: " + vaccine + "\nDose1 Capacity: " + dose1_cap + "\nDose2 Capacity: " + dose2_cap + "\n*__Slots__*\n" + "\n".join(slot_list)
+    msg = "*_" + name + "_*\nPincode: " + pincode + "\nFee: " + fee + "\nDate: " + slot_date + "\nCapacity: " + capacity + "\nAge limit: " + age_limit + "\nVaccine: " + vaccine + "\nDose1 Capacity: " + dose1_cap + "\nDose2 Capacity: " + dose2_cap + "\n*__Slots__*\n" + "\n".join(slot_list) + "\n"
     #print(msg)
     return msg
 
@@ -240,7 +240,6 @@ def update_chat_list():
 
 def parse_json_response(response, chat):
     centers = response['centers']
-    print(centers)
     for center in centers:
         name = center["name"]
         pincode = str(center["pincode"])
@@ -272,6 +271,8 @@ def parse_json_response(response, chat):
     
 if __name__ == "__main__":
     try:
+        if bot_token is None:
+            raise Exception('Bot token missing')
         logger.info("...Service started...")
         states_list = fetchStatesList()
         limit = 15
