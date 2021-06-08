@@ -83,8 +83,8 @@ def send_msg(bot_message, chat_id):
     logger.debug(json.loads(response.content))
     return json.loads(response.content)
 
-def build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap):
-    msg = "*_" + name + "_*\nPincode: " + pincode + "\nFee: " + fee + "\nCapacity: " + capacity + "\nAge limit: " + age_limit + "\nVaccine: " + vaccine + "\nDose1 Capacity: " + dose1_cap + "\nDose2 Capacity: " + dose2_cap + "\n*__Slots__*\n" + "\n".join(slot_list)
+def build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap):
+    msg = "*_" + name + "_*\nPincode: " + pincode + "\nFee: " + fee + "\nDate: " + slot_date + "\nCapacity: " + capacity + "\nAge limit: " + age_limit + "\nVaccine: " + vaccine + "\nDose1 Capacity: " + dose1_cap + "\nDose2 Capacity: " + dose2_cap + "\n*__Slots__*\n" + "\n".join(slot_list)
     #print(msg)
     return msg
 
@@ -245,7 +245,9 @@ def parse_json_response(response, chat):
         name = center["name"]
         pincode = str(center["pincode"])
         fee = center["fee_type"]
+        msg = ""
         for session in center["sessions"]:
+            slot_date = session["date"]
             capacity = str(session["available_capacity"])
             age_limit = str(session["min_age_limit"])
             vaccine = session["vaccine"]
@@ -254,18 +256,16 @@ def parse_json_response(response, chat):
             dose2_cap = str(session["available_capacity_dose2"])
             if (chat['onlyAvailable'].upper() == 'Y' or chat['onlyAvailable'].upper() == 'YES') and capacity > '0':
                 if (chat['only45Plus'].upper() == 'Y' or chat['only45Plus'].upper() == 'YES') and age_limit < '45':
-                    msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
-                    send_msg(msg, chat['id'])
+                    msg += build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
                 elif chat['only45Plus'].upper() == 'N' or chat['only45Plus'].upper() == 'NO':
-                    msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
-                    send_msg(msg, chat['id'])
+                    msg += build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
             elif chat['onlyAvailable'].upper() == 'N' or chat['onlyAvailable'].upper() == 'NO':
                 if (chat['only45Plus'].upper() == 'Y' or chat['only45Plus'].upper() == 'YES') and age_limit < '45':
-                    msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
-                    send_msg(msg, chat['id'])
+                    msg += build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
                 elif chat['only45Plus'].upper() == 'N' or chat['only45Plus'].upper() == 'NO':
-                    msg = build_msg(name, pincode, fee, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)
-                    send_msg(msg, chat['id'])
+                    msg += build_msg(name, pincode, fee, slot_date, capacity, age_limit, vaccine, slot_list, dose1_cap, dose2_cap)  
+        if msg != "":
+            send_msg(msg, chat['id'])
                       
                 
             
